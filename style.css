@@ -1,0 +1,169 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #001f3f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.atm-screen {
+  background: #f2f2f2;
+  color: #000;
+  width: 90%;
+  max-width: 400px;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+}
+
+.message {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  justify-items: center;
+  margin-bottom: 20px;
+}
+
+.keypad button {
+  padding: 20px 0;
+  font-size: 20px;
+  border: none;
+  border-radius: 8px;
+  background-color: #0074D9;
+  color: white;
+  cursor: pointer;
+  width: 100%;
+  min-width: 80px;
+  min-height: 60px;
+  box-sizing: border-box;
+}
+
+/* Custom entry OK/CANCEL row styling */
+.keypad .action-row {
+  display: flex;
+  justify-content: space-between;
+  grid-column: 1 / span 3;
+  width: 100%;
+  margin-top: 20px;
+}
+.keypad .action-row button {
+  flex: 1 1 50%;
+  margin: 0 5px;
+  font-size: 20px;
+  min-width: 0;
+  min-height: 60px;
+  border-radius: 8px;
+  background-color: #0074D9;
+  color: white;
+}
+
+.options {
+  display: grid;
+  grid-template-areas:
+    "a1 . a2"
+    "a3 . a4"
+    "a5 . a6";
+  grid-template-columns: 1fr 0.2fr 1fr;
+  grid-template-rows: repeat(3, 1fr);
+  gap: 10px;
+  justify-content: space-between;
+  margin-top: 10px;
+  width: 100%;
+  height: 60vh;
+  max-height: 400px;
+  align-items: stretch;
+}
+
+.options button {
+  min-width: 100px;
+  min-height: 60px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  background-color: #2ECC40;
+  color: white;
+  padding: 10px;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.option-1 { grid-area: a1; }
+.option-2 { grid-area: a2; }
+.option-3 { grid-area: a3; }
+.option-4 { grid-area: a4; }
+.option-5 { grid-area: a5; }
+.option-6 { grid-area: a6; }
+
+/* Compact keypad for custom entry */
+.keypad.compact {
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.keypad.compact button {
+  padding: 10px 0;
+  font-size: 16px;
+  min-width: 48px;
+  min-height: 36px;
+  border-radius: 6px;
+}
+.keypad.compact .action-row button {
+  font-size: 16px;
+  min-height: 36px;
+  border-radius: 6px;
+}
+
+@media (max-width: 600px) {
+  .atm-screen {
+    width: 100%;
+    padding: 10px;
+  }
+  .options {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "a1 a2"
+      "a3 a4"
+      "a5 a6";
+    height: 50vh;
+    max-height: none;
+  }
+  .options button {
+    min-width: 80px;
+    min-height: 40px;
+    font-size: 0.9rem;
+  }
+  .keypad button, .keypad .action-row button {
+    font-size: 16px;
+    min-width: 60px;
+    min-height: 40px;
+    padding: 10px 0;
+  }
+  .keypad {
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .keypad .action-row {
+    margin-top: 10px;
+  }
+  .keypad.compact button, .keypad.compact .action-row button {
+    font-size: 14px;
+    min-width: 36px;
+    min-height: 28px;
+    padding: 6px 0;
+  }
+  .keypad.compact {
+    gap: 4px;
+    margin-bottom: 4px;
+  }
+}
