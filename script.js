@@ -1,6 +1,7 @@
 let stage = 0;
 let pin = '';
 let userPIN = '1234';
+let pinMode = 'login'; // 'login', 'enquiry', 'change'
 const message = document.getElementById('message');
 const keypad = document.getElementById('keypad');
 const options = document.getElementById('options');
@@ -34,17 +35,39 @@ function showKeypad() {
 
 function handleKeypad(val) {
   if (val === 'OK') {
-    if (pin === userPIN) {
+    if (pin === userPIN && (pinMode === 'login' || pinMode === 'enquiry')) {
       keypad.style.display = 'none';
       message.innerHTML = '';
-      setTimeout(() => {
-        showOptions();
-      }, 300);
+      if (pinMode === 'login') {
+        setTimeout(() => { showOptions(); }, 300);
+      } else if (pinMode === 'enquiry') {
+        setTimeout(() => { showBalanceResult(); }, 300);
+      }
+      pin = '';
+      pinMode = 'login';
+    } else if (pinMode === 'change') {
+      if (pin.length === 4) {
+        userPIN = pin;
+        pin = '';
+        keypad.style.display = 'none';
+        message.innerHTML = 'PIN changed successfully<br>पिन सफलतापूर्वक परिवर्तन भयो';
+        setTimeout(showFinalMessages, 2000);
+        pinMode = 'login';
+      } else {
+        pin = '';
+        message.innerHTML = 'Enter 4 digit PIN<br>४ अंकको पिन प्रविष्ट गर्नुहोस्';
+      }
     } else {
       pin = '';
       message.innerHTML = 'Incorrect PIN<br>गलत पिन';
       setTimeout(() => {
-        message.innerHTML = 'Enter PIN<br>पिन प्रविष्ट गर्नुहोस्';
+        if (pinMode === 'login') {
+          message.innerHTML = 'Enter PIN<br>पिन प्रविष्ट गर्नुहोस्';
+        } else if (pinMode === 'enquiry') {
+          message.innerHTML = 'Re-enter PIN for Balance Enquiry<br>ब्यालेन्स हेर्न पुन: पिन प्रविष्ट गर्नुहोस्';
+        } else if (pinMode === 'change') {
+          message.innerHTML = 'Enter new PIN<br>नयाँ पिन प्रविष्ट गर्नुहोस्';
+        }
       }, 1500);
     }
   } else if (val === '⌫') {
@@ -52,10 +75,13 @@ function handleKeypad(val) {
     message.innerHTML = '*'.repeat(pin.length);
   } else if (val === 'CANCEL') {
     keypad.style.display = 'none';
+    keypad.classList.remove('compact');
     options.style.display = 'none';
     message.innerHTML = 'Your transaction is cancelled<br>तपाईंको लेनदेन रद्द गरिएको छ';
     setTimeout(() => {
       startATM();
+      pin = '';
+      pinMode = 'login';
     }, 3000);
   } else if (pin.length < 4 && !isNaN(val)) {
     pin += val;
@@ -65,6 +91,9 @@ function handleKeypad(val) {
 
 function showOptions() {
   options.style.display = 'grid';
+  options.style.gridTemplateColumns = '1fr 1fr';
+  options.style.gridTemplateRows = 'repeat(3, 1fr)';
+  options.style.gap = '10px';
   options.innerHTML = '';
   const btns = [
     { label: 'Enquiry Balance<br>ब्यालेन्स हेर्नुहोस्', fn: showEnquiryOptions },
@@ -264,10 +293,41 @@ function showDepositOptions() {
 
 function showEnquiryOptions() {
   options.innerHTML = '';
-  message.innerHTML = 'No account type options available<br>खाता प्रकार उपलब्ध छैन';
-  setTimeout(() => {
-    showOptions();
-  }, 2000);
+  message.innerHTML = 'Re-enter PIN for Balance Enquiry<br>ब्यालेन्स हेर्न पुन: पिन प्रविष्ट गर्नुहोस्';
+  pin = '';
+  pinMode = 'enquiry';
+  showKeypad();
+}
+
+function showBalanceResult() {
+  options.innerHTML = '';
+  message.innerHTML = 'Your Balance: Rs. 50,000<br>तपाईंको ब्यालेन्स: रु. ५०,०००';
+  const printBtn = document.createElement('button');
+  printBtn.innerText = 'Print';
+  printBtn.onclick = function() {
+    options.style.display = 'none';
+    message.innerHTML = 'Printing...<br>प्रिन्ट हुँदैछ';
+    setTimeout(() => {
+      message.innerHTML = 'Take your receipt<br>रसीद लिनुहोस्';
+      setTimeout(() => {
+        startATM();
+      }, 2000);
+    }, 2000);
+  };
+  const cancelBtn = document.createElement('button');
+  cancelBtn.innerText = 'Cancel';
+  cancelBtn.onclick = function() {
+    options.style.display = 'none';
+    message.innerHTML = 'Your transaction is cancelled<br>तपाईंको लेनदेन रद्द गरिएको छ';
+    setTimeout(() => {
+      startATM();
+    }, 2000);
+  };
+  options.appendChild(printBtn);
+  options.appendChild(cancelBtn);
+  options.style.display = 'grid';
+  options.style.gridTemplateColumns = '1fr 1fr';
+  options.style.gap = '10px';
 }
 
 function showTransactionOptions() {
@@ -314,37 +374,9 @@ function showSuccess() {
 
 function changePIN() {
   pin = '';
+  pinMode = 'change';
   message.innerHTML = 'Enter new PIN<br>नयाँ पिन प्रविष्ट गर्नुहोस्';
-  keypad.style.display = 'grid';
-  const prevHandler = handleKeypad;
-  handleKeypad = function(val) {
-    if (val === 'OK') {
-      if (pin.length === 4) {
-        userPIN = pin;
-        pin = '';
-        keypad.style.display = 'none';
-        message.innerHTML = 'PIN changed successfully<br>पिन सफलतापूर्वक परिवर्तन भयो';
-        setTimeout(showFinalMessages, 2000);
-        handleKeypad = prevHandler;
-      } else {
-        message.innerHTML = 'Enter 4 digit PIN<br>४ अंकको पिन प्रविष्ट गर्नुहोस्';
-      }
-    } else if (val === '⌫') {
-      pin = pin.slice(0, -1);
-      message.innerHTML = '*'.repeat(pin.length);
-    } else if (val === 'CANCEL') {
-      keypad.style.display = 'none';
-      options.style.display = 'none';
-      message.innerHTML = 'Your transaction is cancelled<br>तपाईंको लेनदेन रद्द गरिएको छ';
-      setTimeout(() => {
-        startATM();
-        handleKeypad = prevHandler;
-      }, 3000);
-    } else if (pin.length < 4 && !isNaN(val)) {
-      pin += val;
-      message.innerHTML = '*'.repeat(pin.length);
-    }
-  }
+  showKeypad();
 }
 
 function showFinalMessages() {
@@ -364,7 +396,12 @@ function showFinalMessages() {
 function startATM() {
   message.innerHTML = 'Please insert your card<br>कृपया तपाईंको कार्ड हाल्नुहोस्';
   keypad.style.display = 'none';
+  keypad.innerHTML = '';
+  keypad.classList.remove('compact');
   options.style.display = 'none';
+  options.innerHTML = '';
+  pin = '';
+  pinMode = 'login';
   setTimeout(() => {
     message.innerHTML = 'Your transaction is being processed<br>तपाईंको लेनदेन प्रक्रिया हुँदैछ';
     setTimeout(() => {
