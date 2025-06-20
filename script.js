@@ -264,14 +264,10 @@ function showDepositOptions() {
 
 function showEnquiryOptions() {
   options.innerHTML = '';
-  message.innerHTML = 'Select Account Type<br>खाता प्रकार छान्नुहोस्';
-  ['Saving', 'Current', 'Fixed Deposit'].forEach(type => {
-    const btn = document.createElement('button');
-    btn.innerText = type;
-    btn.onclick = showSuccess;
-    btn.style.margin = '5px';
-    options.appendChild(btn);
-  });
+  message.innerHTML = 'No account type options available<br>खाता प्रकार उपलब्ध छैन';
+  setTimeout(() => {
+    showOptions();
+  }, 2000);
 }
 
 function showTransactionOptions() {
